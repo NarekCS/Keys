@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AdvancedApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,14 +18,19 @@ namespace AdvancedApp.Controllers
         {
             return View(context.Employees);
         }
-        public IActionResult Edit(long id)
+        //public IActionResult Edit(long id)
+        //{
+        //    return View(id == default(long) ? new Employee() : context.Employees.Include(e => e.OtherIdentity).First(e => e.Id == id));
+        //}
+        public IActionResult Edit(string SSN)
         {
-            return View(id == default(long) ? new Employee() : context.Employees.Find(id));
+            return View(string.IsNullOrWhiteSpace(SSN) ? new Employee() : context.Employees.Include(e => e.OtherIdentity).First(e => e.SSN == SSN));
         }
+
         [HttpPost]
         public IActionResult Update(Employee employee)
         {
-            if (employee.Id == default(long))
+            if (context.Employees.Count(e => e.SSN == employee.SSN) == 0) //if (employee.Id == default(long))
             {
                 context.Add(employee);
             }

@@ -12,5 +12,6 @@ namespace AdvancedApp.Models
         public string FirstName { get; set; }
         public string FamilyName { get; set; }
         public decimal Salary { get; set; }
+        public SecondaryIdentity OtherIdentity { get; set; }
     }
 }
