@@ -10,6 +10,7 @@ namespace AdvancedApp.Models
     {
         public AdvancedContext(DbContextOptions<AdvancedContext> options) : base(options)
         {
+            //ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
         public DbSet<Employee> Employees { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -17,6 +18,7 @@ namespace AdvancedApp.Models
             // modelBuilder.Entity<Employee>().Property(e => e.Id).ForSqlServerUseSequenceHiLo();
             // modelBuilder.Entity<Employee>().HasIndex(e => e.SSN).HasName("SSNIndex").IsUnique();
             // modelBuilder.Entity<Employee>().HasAlternateKey(e => e.SSN);
+            modelBuilder.Entity<Employee>().HasQueryFilter(e => !e.SoftDeleted);
 
             modelBuilder.Entity<Employee>().Ignore(e => e.Id);
             //modelBuilder.Entity<Employee>().HasKey(e => e.SSN);
