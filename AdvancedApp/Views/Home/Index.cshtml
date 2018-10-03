@@ -26,7 +26,10 @@
                 <td>@e.FamilyName</td>      
                 <td>@e.Salary</td>   
                 <td class="text-right"> 
-                    <a asp-action="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-primary">Edit</a>         
+                    <a asp-action="Edit" asp-route-SSN="@e.SSN"
+                                         asp-route-firstname="@e.FirstName"           
+                                         asp-route-familyname="@e.FamilyName"
+                                         class="btn btn-sm btn-primary">Edit</a>         
                 </td>        
             </tr>
         }

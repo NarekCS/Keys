@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AdvancedApp.Migrations
 {
-    public partial class NaturalPrimaryKey : Migration
+    public partial class CompositeKey : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -29,10 +29,24 @@ namespace AdvancedApp.Migrations
                 oldClrType: typeof(string),
                 oldNullable: true);
 
+            migrationBuilder.AlterColumn<string>(
+                name: "FirstName",
+                table: "Employees",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "FamilyName",
+                table: "Employees",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldNullable: true);
+
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Employees",
                 table: "Employees",
-                column: "SSN");
+                columns: new[] { "SSN", "FirstName", "FamilyName" });
 
             migrationBuilder.CreateTable(
                 name: "SecondaryIdentity",
@@ -42,25 +56,27 @@ namespace AdvancedApp.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
                     InActiveUse = table.Column<bool>(nullable: false),
-                    PrimarySSN = table.Column<string>(nullable: true)
+                    PrimarySSN = table.Column<string>(nullable: true),
+                    PrimaryFamilyName = table.Column<string>(nullable: true),
+                    PrimaryFirstName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SecondaryIdentity", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SecondaryIdentity_Employees_PrimarySSN",
-                        column: x => x.PrimarySSN,
+                        name: "FK_SecondaryIdentity_Employees_PrimarySSN_PrimaryFirstName_PrimaryFamilyName",
+                        columns: x => new { x.PrimarySSN, x.PrimaryFirstName, x.PrimaryFamilyName },
                         principalTable: "Employees",
-                        principalColumn: "SSN",
+                        principalColumns: new[] { "SSN", "FirstName", "FamilyName" },
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_SecondaryIdentity_PrimarySSN",
+                name: "IX_SecondaryIdentity_PrimarySSN_PrimaryFirstName_PrimaryFamilyName",
                 table: "SecondaryIdentity",
-                column: "PrimarySSN",
+                columns: new[] { "PrimarySSN", "PrimaryFirstName", "PrimaryFamilyName" },
                 unique: true,
-                filter: "[PrimarySSN] IS NOT NULL");
+                filter: "[PrimarySSN] IS NOT NULL AND [PrimaryFirstName] IS NOT NULL AND [PrimaryFamilyName] IS NOT NULL");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -75,6 +91,18 @@ namespace AdvancedApp.Migrations
             migrationBuilder.CreateSequence(
                 name: "EntityFrameworkHiLoSequence",
                 incrementBy: 10);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "FamilyName",
+                table: "Employees",
+                nullable: true,
+                oldClrType: typeof(string));
+
+            migrationBuilder.AlterColumn<string>(
+                name: "FirstName",
+                table: "Employees",
+                nullable: true,
+                oldClrType: typeof(string));
 
             migrationBuilder.AlterColumn<string>(
                 name: "SSN",

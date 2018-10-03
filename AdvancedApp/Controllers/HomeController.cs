@@ -22,15 +22,22 @@ namespace AdvancedApp.Controllers
         //{
         //    return View(id == default(long) ? new Employee() : context.Employees.Include(e => e.OtherIdentity).First(e => e.Id == id));
         //}
-        public IActionResult Edit(string SSN)
+        //public IActionResult Edit(string SSN)
+        //{
+        //    return View(string.IsNullOrWhiteSpace(SSN) ? new Employee() : context.Employees.Include(e => e.OtherIdentity).First(e => e.SSN == SSN));
+        //}
+        public IActionResult Edit(string SSN, string firstName, string familyName)
         {
-            return View(string.IsNullOrWhiteSpace(SSN) ? new Employee() : context.Employees.Include(e => e.OtherIdentity).First(e => e.SSN == SSN));
+            return View(string.IsNullOrWhiteSpace(SSN) ? new Employee() : context.Employees.Include(e => e.OtherIdentity)
+                                                                            .First(e => e.SSN == SSN && e.FirstName == firstName && e.FamilyName == familyName));
         }
 
         [HttpPost]
         public IActionResult Update(Employee employee)
         {
-            if (context.Employees.Count(e => e.SSN == employee.SSN) == 0) //if (employee.Id == default(long))
+            //if (employee.Id == default(long))
+            //if (context.Employees.Count(e => e.SSN == employee.SSN) == 0) 
+            if (context.Employees.Count(e => e.SSN == employee.SSN && e.FirstName == employee.FirstName && e.FamilyName == employee.FamilyName) == 0)
             {
                 context.Add(employee);
             }
