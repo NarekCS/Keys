@@ -18,15 +18,22 @@ namespace AdvancedApp.Controllers
             = EF.CompileQuery((AdvancedContext context, string searchTerm) => context.Employees.Where(e => EF.Functions.Like(e.FirstName, searchTerm)));
 
         public HomeController(AdvancedContext ctx) => context = ctx;
+
+        public IActionResult Index()
+        {
+            return View(context.Employees.Include(e => e.OtherIdentity).OrderByDescending(e => EF.Property<DateTime>(e, "LastUpdated"))); 
+        }
+
+
         //public IActionResult Index()
         //{
         //    return View(context.Employees.AsNoTracking());
         //}
 
-        public IActionResult Index(string searchTerm)
-        {
-            return View(string.IsNullOrEmpty(searchTerm) ? context.Employees : query(context, searchTerm));
-        }
+        //public IActionResult Index(string searchTerm)
+        //{
+        //    return View(string.IsNullOrEmpty(searchTerm) ? context.Employees : query(context, searchTerm));
+        //}
 
 
         //public async Task<IActionResult> Index(string searchTerm)
@@ -52,28 +59,65 @@ namespace AdvancedApp.Controllers
         public IActionResult Edit(string SSN, string firstName, string familyName)
         {
             return View(string.IsNullOrWhiteSpace(SSN) ? new Employee() : context.Employees.Include(e => e.OtherIdentity)
-                                                                            .AsNoTracking()
+                                                                            //.AsNoTracking()
                                                                             .First(e => e.SSN == SSN && e.FirstName == firstName && e.FamilyName == familyName));
         }
 
+        //[HttpPost]
+        //public IActionResult Update(Employee employee)
+        //{
+        //    // Employee existing = context.Employees.AsTracking().First(e => e.SSN == employee.SSN && e.FirstName == employee.FirstName && e.FamilyName == employee.FamilyName);
+        //    //Employee existing = context.Employees.Find(employee.SSN, employee.FirstName, employee.FamilyName);
+        //    //if (employee.Id == default(long))
+        //    //if (context.Employees.Count(e => e.SSN == employee.SSN) == 0) 
+        //    //if (context.Employees.Find(employee.SSN, employee.FirstName, employee.FamilyName) == null)
+        //    //if (existing == null)
+        //    if (context.Employees.Count(e => e.SSN == employee.SSN && e.FirstName == employee.FirstName && e.FamilyName == employee.FamilyName) == 0)
+        //    {
+        //        context.Add(employee);
+        //    }
+        //    else
+        //    {
+        //        //context.Entry(existing).State = EntityState.Detached;
+        //        //existing.Salary = employee.Salary;
+        //        context.Update(employee);
+        //    }
+        //    context.SaveChanges();
+        //    return RedirectToAction(nameof(Index));
+        //}
+
+        //[HttpPost]
+        //public IActionResult Update(Employee employee, decimal salary)
+        //{
+        //    Employee existing = context.Employees.Find(employee.SSN, employee.FirstName, employee.FamilyName);
+        //    if (existing == null)
+        //    {
+        //        //context.Entry(employee).Property("LastUpdated").CurrentValue = System.DateTime.Now; 
+        //        context.Add(employee);
+        //    }
+        //    else
+        //    {
+        //        existing.Salary = salary;               
+        //        context.Entry(existing).Property("LastUpdated").CurrentValue = System.DateTime.Now;
+        //    }
+        //    context.SaveChanges();
+        //    return RedirectToAction(nameof(Index));
+        //}
+
         [HttpPost]
-        public IActionResult Update(Employee employee)
+        public IActionResult Update(Employee employee)//, decimal originalSalary)
         {
-            Employee existing = context.Employees.AsTracking().First(e => e.SSN == employee.SSN && e.FirstName == employee.FirstName && e.FamilyName == employee.FamilyName);
-            //Employee existing = context.Employees.Find(employee.SSN, employee.FirstName, employee.FamilyName);
-            //if (employee.Id == default(long))
-            //if (context.Employees.Count(e => e.SSN == employee.SSN) == 0) 
-            //if (context.Employees.Find(employee.SSN, employee.FirstName, employee.FamilyName) == null)
-            if (existing == null)
-            //if (context.Employees.Count(e => e.SSN == employee.SSN && e.FirstName == employee.FirstName && e.FamilyName == employee.FamilyName) == 0)
+            if (context.Employees.Count(e => e.SSN == employee.SSN && e.FirstName == employee.FirstName && e.FamilyName == employee.FamilyName) == 0)
             {
                 context.Add(employee);
             }
             else
             {
-                //context.Entry(existing).State = EntityState.Detached;
-                //context.Update(employee);
-                existing.Salary = employee.Salary;
+                //Employee e = new Employee { SSN = employee.SSN, FirstName = employee.FirstName, FamilyName = employee.FamilyName, Salary = originalSalary };
+                Employee e = new Employee { SSN = employee.SSN, FirstName = employee.FirstName, FamilyName = employee.FamilyName, RowVersion = employee.RowVersion };
+                context.Employees.Attach(e);
+                e.Salary = employee.Salary;
+                e.LastUpdated = DateTime.Now;
             }
             context.SaveChanges();
             return RedirectToAction(nameof(Index));
