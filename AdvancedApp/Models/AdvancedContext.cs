@@ -39,7 +39,8 @@ namespace AdvancedApp.Models
                 //.HasPrincipalKey<Employee>(e => e.SSN)
                 //.HasForeignKey<SecondaryIdentity>(s => s.PrimarySSN);
                 .HasPrincipalKey<Employee>(e => new { e.SSN, e.FirstName, e.FamilyName })
-                .HasForeignKey<SecondaryIdentity>(s => new { s.PrimarySSN, s.PrimaryFirstName, s.PrimaryFamilyName });
+                .HasForeignKey<SecondaryIdentity>(s => new { s.PrimarySSN, s.PrimaryFirstName, s.PrimaryFamilyName })
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<SecondaryIdentity>().Property(e => e.Name).HasMaxLength(100);
         }

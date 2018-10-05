@@ -21,7 +21,11 @@ namespace AdvancedApp.Controllers
 
         public IActionResult Index()
         {
-            return View(context.Employees.Include(e => e.OtherIdentity).OrderByDescending(e => EF.Property<DateTime>(e, "LastUpdated"))); 
+            //ViewBag.Secondaries = context.Set<SecondaryIdentity>();
+            //return View(context.Employees.Include(e => e.OtherIdentity).OrderByDescending(e => EF.Property<DateTime>(e, "LastUpdated"))); 
+            IEnumerable<Employee> data = context.Employees.Include(e => e.OtherIdentity).OrderByDescending(e => e.LastUpdated).ToArray();
+            ViewBag.Secondaries = data.Select(e => e.OtherIdentity);
+            return View(data);
         }
 
 
@@ -126,6 +130,20 @@ namespace AdvancedApp.Controllers
         [HttpPost]
         public IActionResult Delete(Employee employee)
         {
+
+            //if (employee.OtherIdentity != null)
+            //{
+            //    //context.Set<SecondaryIdentity>().Remove(employee.OtherIdentity);                
+            //    //SecondaryIdentity s = context.Set<SecondaryIdentity>().Find(employee.OtherIdentity.Id);  ???
+            //    context.Attach(employee);
+            //    employee.OtherIdentity.PrimarySSN = null;
+            //    employee.OtherIdentity.PrimaryFirstName = null;
+            //    employee.OtherIdentity.PrimaryFamilyName = null;
+            //    employee.OtherIdentity = null;
+            //}
+            ////context.Set<SecondaryIdentity>().FirstOrDefault(id => id.PrimarySSN == employee.SSN && id.PrimaryFirstName == employee.FirstName && id.PrimaryFamilyName == employee.FamilyName);
+            ////context.Employees.Remove(employee);           
+            //context.Remove(employee);
             context.Attach(employee);
             employee.SoftDeleted = true;
             context.SaveChanges();
