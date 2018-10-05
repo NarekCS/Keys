@@ -19,14 +19,52 @@ namespace AdvancedApp.Controllers
 
         public HomeController(AdvancedContext ctx) => context = ctx;
 
-        public IActionResult Index()
+
+        public IActionResult Index(string searchTerm)
         {
-            //ViewBag.Secondaries = context.Set<SecondaryIdentity>();
-            //return View(context.Employees.Include(e => e.OtherIdentity).OrderByDescending(e => EF.Property<DateTime>(e, "LastUpdated"))); 
-            IEnumerable<Employee> data = context.Employees.Include(e => e.OtherIdentity).OrderByDescending(e => e.LastUpdated).ToArray();
+            IQueryable<Employee> query = context.Employees.Include(e => e.OtherIdentity);
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                //query = query.Where(e => EF.Functions.Like($"{e.FirstName[0]}{e.FamilyName}", searchTerm));
+                query = query.Where(e => EF.Functions.Like(e.GeneratedValue, searchTerm));
+            }
+            IEnumerable<Employee> data = query.ToArray();
             ViewBag.Secondaries = data.Select(e => e.OtherIdentity);
             return View(data);
         }
+        //public IActionResult Index(decimal salary = 0)
+        //{
+        //    //ViewBag.Secondaries = context.Set<SecondaryIdentity>();
+        //    //return View(context.Employees.Include(e => e.OtherIdentity).OrderByDescending(e => EF.Property<DateTime>(e, "LastUpdated"))); 
+        //    //IEnumerable<Employee> data = context.Employees.Include(e => e.OtherIdentity).OrderByDescending(e => e.LastUpdated).ToArray();
+
+        //    //IEnumerable<Employee> data = context.Employees.FromSql($@"SELECT * FROM Employees
+        //    //                                                            WHERE SoftDeleted = 0  
+        //    //                                                            AND Salary > {salary}")
+        //    //                                                           // ORDER BY Salary DESC")
+        //    //                                                            .Include(e => e.OtherIdentity)
+        //    //                                                            .OrderByDescending(e => e.Salary)
+        //    //                                                            .OrderByDescending(e => e.LastUpdated).ToArray(); 
+
+        //    //IEnumerable<Employee> data = context.Employees.FromSql($"Execute GetBySalary @SalaryFilter = {salary}").IgnoreQueryFilters();
+
+        //    //IEnumerable<Employee> data = context.Employees.FromSql($@"SELECT * from NotDeletedView      
+        //    //                                                            WHERE Salary > {salary}")
+        //    //                                                            .Include(e => e.OtherIdentity)
+        //    //                                                            .OrderByDescending(e => e.Salary)
+        //    //                                                            .OrderByDescending(e => e.LastUpdated)
+        //    //                                                            .IgnoreQueryFilters().ToArray();
+
+        //    IEnumerable<Employee> data = context.Employees
+        //                                                    //.FromSql($@"SELECT * from GetSalaryTable({salary})")
+        //                                                    .Include(e => e.OtherIdentity)  
+        //                                                     //.OrderByDescending(e => e.Salary) 
+        //                                                     .OrderByDescending(e => e.LastUpdated)
+        //                                                     .IgnoreQueryFilters()
+        //                                                     .ToArray(); 
+        //    ViewBag.Secondaries = data.Select(e => e.OtherIdentity);
+        //    return View(data);
+        //}
 
 
         //public IActionResult Index()

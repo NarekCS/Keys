@@ -38,13 +38,25 @@ namespace AdvancedApp.Controllers
             context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
+        //[HttpPost]
+        //public IActionResult DeleteAll()
+        //{
+        //    IEnumerable<Employee> data = context.Employees.IgnoreQueryFilters().Include(e => e.OtherIdentity).Where(e => e.SoftDeleted).ToArray();
+        //    context.RemoveRange(data.Select(e => e.OtherIdentity));
+        //    context.RemoveRange(data);
+        //    context.SaveChanges();
+        //    return RedirectToAction(nameof(Index));
+        //}
         [HttpPost]
         public IActionResult DeleteAll()
         {
-            IEnumerable<Employee> data = context.Employees.IgnoreQueryFilters().Include(e => e.OtherIdentity).Where(e => e.SoftDeleted).ToArray();
-            context.RemoveRange(data.Select(e => e.OtherIdentity));
-            context.RemoveRange(data);
-            context.SaveChanges();
+            context.Database.ExecuteSqlCommand("EXECUTE PurgeSoftDelete");
+            return RedirectToAction(nameof(Index));
+        }
+        [HttpPost]
+        public IActionResult RestoreAll()
+        {
+            context.Database.ExecuteSqlCommand("EXECUTE RestoreSoftDelete");
             return RedirectToAction(nameof(Index));
         }
     }

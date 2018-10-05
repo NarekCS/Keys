@@ -24,8 +24,7 @@ namespace AdvancedApp
             services.AddMvc();
             string conString = Configuration["ConnectionStrings:DefaultConnection"];
             services.AddDbContext<AdvancedContext>(options =>
-                            options.UseSqlServer(conString).ConfigureWarnings(warning =>
-                                               warning.Throw(RelationalEventId.QueryClientEvaluationWarning)));
+                            options.UseSqlServer(conString));//.ConfigureWarnings(warning => warning.Throw(RelationalEventId.QueryClientEvaluationWarning)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

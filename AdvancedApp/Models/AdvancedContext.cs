@@ -18,7 +18,8 @@ namespace AdvancedApp.Models
             // modelBuilder.Entity<Employee>().Property(e => e.Id).ForSqlServerUseSequenceHiLo();
             // modelBuilder.Entity<Employee>().HasIndex(e => e.SSN).HasName("SSNIndex").IsUnique();
             // modelBuilder.Entity<Employee>().HasAlternateKey(e => e.SSN);
-            modelBuilder.Entity<Employee>().HasQueryFilter(e => !e.SoftDeleted);
+
+               modelBuilder.Entity<Employee>().HasQueryFilter(e => !e.SoftDeleted);
 
             modelBuilder.Entity<Employee>().Ignore(e => e.Id);
             //modelBuilder.Entity<Employee>().HasKey(e => e.SSN);
@@ -30,8 +31,18 @@ namespace AdvancedApp.Models
                 //.IsConcurrencyToken();
 
             modelBuilder.Entity<Employee>().Property<DateTime>("LastUpdated").HasDefaultValue(new DateTime(2000, 1, 1));
+           // modelBuilder.Entity<Employee>().Property(e => e.GeneratedValue).HasDefaultValueSql("GETDATE()");
 
-            modelBuilder.Entity<Employee>().Property(e => e.RowVersion).IsRowVersion();
+            modelBuilder.HasSequence<int>("ReferenceSequence").StartsAt(100).IncrementsBy(2);
+            modelBuilder.Entity<Employee>().Property(e => e.GeneratedValue)
+               // .HasDefaultValueSql(@"'REFERENCE_' + CONVERT(varchar, NEXT VALUE FOR ReferenceSequence)");
+            .HasComputedColumnSql(@"SUBSTRING(FirstName, 1, 1) + FamilyName PERSISTED");
+            modelBuilder.Entity<Employee>().HasIndex(e => e.GeneratedValue);
+
+
+            modelBuilder.Entity<Employee>()
+                .Ignore(e => e.RowVersion);
+            //.Property(e => e.RowVersion).IsRowVersion();
 
             modelBuilder.Entity<SecondaryIdentity>()
                 .HasOne(s => s.PrimaryIdentity)
