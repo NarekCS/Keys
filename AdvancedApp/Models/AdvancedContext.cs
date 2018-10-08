@@ -34,11 +34,12 @@ namespace AdvancedApp.Models
            // modelBuilder.Entity<Employee>().Property(e => e.GeneratedValue).HasDefaultValueSql("GETDATE()");
 
             modelBuilder.HasSequence<int>("ReferenceSequence").StartsAt(100).IncrementsBy(2);
-            modelBuilder.Entity<Employee>().Property(e => e.GeneratedValue)
-               // .HasDefaultValueSql(@"'REFERENCE_' + CONVERT(varchar, NEXT VALUE FOR ReferenceSequence)");
-            .HasComputedColumnSql(@"SUBSTRING(FirstName, 1, 1) + FamilyName PERSISTED");
-            modelBuilder.Entity<Employee>().HasIndex(e => e.GeneratedValue);
+            //modelBuilder.Entity<Employee>().Property(e => e.GeneratedValue)
+            //   // .HasDefaultValueSql(@"'REFERENCE_' + CONVERT(varchar, NEXT VALUE FOR ReferenceSequence)");
+            //.HasComputedColumnSql(@"SUBSTRING(FirstName, 1, 1) + FamilyName PERSISTED");
+            //modelBuilder.Entity<Employee>().HasIndex(e => e.GeneratedValue);
 
+            modelBuilder.Entity<Employee>().Property(e => e.GeneratedValue).ValueGeneratedOnAddOrUpdate();
 
             modelBuilder.Entity<Employee>()
                 .Ignore(e => e.RowVersion);
