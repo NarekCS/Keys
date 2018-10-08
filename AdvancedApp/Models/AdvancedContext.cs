@@ -11,6 +11,7 @@ namespace AdvancedApp.Models
         public AdvancedContext(DbContextOptions<AdvancedContext> options) : base(options)
         {
             //ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            Database.AutoTransactionsEnabled = false;
         }
         public DbSet<Employee> Employees { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
